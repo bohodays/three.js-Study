@@ -1,9 +1,42 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-// ----- 주제: OrbitControls
+// ----- 주제: 텍스쳐 이미지 변환
 
 export default function example() {
+  // 텍스쳐 이미지 로드
+  const loadingManager = new THREE.LoadingManager();
+  loadingManager.onStart = () => {
+    console.log("로드 시작");
+  };
+  loadingManager.onProgress = (img) => {
+    console.log(img + " 로드");
+  };
+  loadingManager.onLoad = () => {
+    console.log("로드 완료");
+  };
+  loadingManager.onError = () => {
+    console.log("에러");
+  };
+
+  const textureLoader = new THREE.TextureLoader(loadingManager);
+  const texture = textureLoader.load(
+    "/textures/skull/Ground Skull_basecolor.jpg"
+  );
+
+  // 텍스쳐 변환
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  // texture.offset.x = 0.3;
+  // texture.offset.y = 0.3;
+
+  // texture.repeat.x = 2;
+  // texture.repeat.y = 2;
+
+  texture.rotation = Math.PI / 4;
+  texture.center.x = 0.5;
+  texture.center.y = 0.5;
+
   // Renderer
   const canvas = document.querySelector("#three-canvas");
   const renderer = new THREE.WebGLRenderer({
@@ -38,43 +71,22 @@ export default function example() {
 
   // Controls
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  // controls.enableZoom = false;
-  // controls.maxDistance = 10;
-  // controls.minDistance = 2;
-  // controls.minPolarAngle = Math.PI / 4; // 45도
-  // controls.maxPolarAngle = THREE.MathUtils.degToRad(135);
-  // controls.target.set(2, 2, 2);
-  // controls.autoRotate = true;
-  // controls.autoRotateSpeed = 2;
 
   // Mesh
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  let mesh;
-  let material;
-  for (let i = 0; i < 20; i++) {
-    material = new THREE.MeshStandardMaterial({
-      color: `rgb(
-					${50 + Math.floor(Math.random() * 205)}, 
-					${50 + Math.floor(Math.random() * 205)}, 
-					${50 + Math.floor(Math.random() * 205)}
-				)`,
-      side: THREE.DoubleSide,
-    });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = (Math.random() - 0.5) * 5;
-    mesh.position.y = (Math.random() - 0.5) * 5;
-    mesh.position.z = (Math.random() - 0.5) * 5;
-    scene.add(mesh);
-  }
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshStandardMaterial({
+    // color: "orangered",
+    map: texture,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
 
   // 그리기
   const clock = new THREE.Clock();
 
   function draw() {
     const delta = clock.getDelta();
-
-    controls.update();
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);

@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 
-// ----- 주제: OrbitControls
+// ----- 주제: PointerLockControls
 
 export default function example() {
   // Renderer
@@ -37,16 +37,18 @@ export default function example() {
   scene.add(directionalLight);
 
   // Controls
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  // controls.enableZoom = false;
-  // controls.maxDistance = 10;
-  // controls.minDistance = 2;
-  // controls.minPolarAngle = Math.PI / 4; // 45도
-  // controls.maxPolarAngle = THREE.MathUtils.degToRad(135);
-  // controls.target.set(2, 2, 2);
-  // controls.autoRotate = true;
-  // controls.autoRotateSpeed = 2;
+  const controls = new PointerLockControls(camera, renderer.domElement);
+  controls.domElement.addEventListener("click", () => {
+    controls.lock();
+  });
+
+  controls.addEventListener("lock", () => {
+    console.log("lock");
+  });
+
+  controls.addEventListener("unlock", () => {
+    console.log("unlock");
+  });
 
   // Mesh
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -73,8 +75,6 @@ export default function example() {
 
   function draw() {
     const delta = clock.getDelta();
-
-    controls.update();
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);

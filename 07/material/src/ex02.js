@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-// ----- 주제: OrbitControls
+// ----- 주제: MeshLambertMaterial, MeshPhongMaterial
 
 export default function example() {
   // Renderer
@@ -38,43 +38,29 @@ export default function example() {
 
   // Controls
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  // controls.enableZoom = false;
-  // controls.maxDistance = 10;
-  // controls.minDistance = 2;
-  // controls.minPolarAngle = Math.PI / 4; // 45도
-  // controls.maxPolarAngle = THREE.MathUtils.degToRad(135);
-  // controls.target.set(2, 2, 2);
-  // controls.autoRotate = true;
-  // controls.autoRotateSpeed = 2;
 
   // Mesh
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  let mesh;
-  let material;
-  for (let i = 0; i < 20; i++) {
-    material = new THREE.MeshStandardMaterial({
-      color: `rgb(
-					${50 + Math.floor(Math.random() * 205)}, 
-					${50 + Math.floor(Math.random() * 205)}, 
-					${50 + Math.floor(Math.random() * 205)}
-				)`,
-      side: THREE.DoubleSide,
-    });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = (Math.random() - 0.5) * 5;
-    mesh.position.y = (Math.random() - 0.5) * 5;
-    mesh.position.z = (Math.random() - 0.5) * 5;
-    scene.add(mesh);
-  }
+  const geometry = new THREE.SphereGeometry(1, 16, 16);
+  // MeshLambertMeterial 하이라이트, 반사광 없는 재질
+  const material1 = new THREE.MeshLambertMaterial({
+    color: "orange",
+  });
+  // MeshPhongMaterial 하이라이트, 반사광 표현 가능
+  const material2 = new THREE.MeshPhongMaterial({
+    color: "orange",
+    shininess: 1000, // 0으로 하면 LambertMaterial과 같아진다.
+  });
+  const mesh1 = new THREE.Mesh(geometry, material1);
+  const mesh2 = new THREE.Mesh(geometry, material2);
+  mesh1.position.x = -1.5;
+  mesh2.position.x = 1.5;
+  scene.add(mesh1, mesh2);
 
   // 그리기
   const clock = new THREE.Clock();
 
   function draw() {
     const delta = clock.getDelta();
-
-    controls.update();
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);

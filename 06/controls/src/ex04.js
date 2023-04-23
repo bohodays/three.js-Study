@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { FirstPersonControls } from "three/examples/jsm/controls/FirstPersonControls";
 
-// ----- 주제: OrbitControls
+// ----- 주제: FirstPersonControls
 
 export default function example() {
   // Renderer
@@ -37,16 +37,11 @@ export default function example() {
   scene.add(directionalLight);
 
   // Controls
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  // controls.enableZoom = false;
-  // controls.maxDistance = 10;
-  // controls.minDistance = 2;
-  // controls.minPolarAngle = Math.PI / 4; // 45도
-  // controls.maxPolarAngle = THREE.MathUtils.degToRad(135);
-  // controls.target.set(2, 2, 2);
-  // controls.autoRotate = true;
-  // controls.autoRotateSpeed = 2;
+  const controls = new FirstPersonControls(camera, renderer.domElement);
+  controls.movementSpeed = 5;
+  controls.activeLook = false;
+  controls.lookSpeed = 0.1;
+  // controls.autoForward = true;
 
   // Mesh
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -74,7 +69,7 @@ export default function example() {
   function draw() {
     const delta = clock.getDelta();
 
-    controls.update();
+    controls.update(delta);
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);

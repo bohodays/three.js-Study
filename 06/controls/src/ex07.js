@@ -1,7 +1,8 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
+import { KeyController } from "./KeyController";
 
-// ----- 주제: OrbitControls
+// ----- 주제: PointerLockControls에 키보드 컨트롤 추가
 
 export default function example() {
   // Renderer
@@ -37,16 +38,36 @@ export default function example() {
   scene.add(directionalLight);
 
   // Controls
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  // controls.enableZoom = false;
-  // controls.maxDistance = 10;
-  // controls.minDistance = 2;
-  // controls.minPolarAngle = Math.PI / 4; // 45도
-  // controls.maxPolarAngle = THREE.MathUtils.degToRad(135);
-  // controls.target.set(2, 2, 2);
-  // controls.autoRotate = true;
-  // controls.autoRotateSpeed = 2;
+  const controls = new PointerLockControls(camera, renderer.domElement);
+  controls.domElement.addEventListener("click", () => {
+    controls.lock();
+  });
+
+  controls.addEventListener("lock", () => {
+    console.log("lock");
+  });
+
+  controls.addEventListener("unlock", () => {
+    console.log("unlock");
+  });
+
+  // 키보드 컨트롤
+  const keyController = new KeyController();
+
+  function walk() {
+    if (keyController.keys["KeyW"] || keyController.keys["ArrowUp"]) {
+      controls.moveForward(0.02);
+    }
+    if (keyController.keys["KeyS"] || keyController.keys["ArrowDown"]) {
+      controls.moveForward(-0.02);
+    }
+    if (keyController.keys["KeyA"] || keyController.keys["ArrowLeft"]) {
+      controls.moveRight(-0.02);
+    }
+    if (keyController.keys["KeyD"] || keyController.keys["ArrowRight"]) {
+      controls.moveRight(0.02);
+    }
+  }
 
   // Mesh
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -74,7 +95,7 @@ export default function example() {
   function draw() {
     const delta = clock.getDelta();
 
-    controls.update();
+    walk();
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);
