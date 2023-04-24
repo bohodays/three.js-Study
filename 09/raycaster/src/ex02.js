@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { PreventDragClick } from "./PreventDragClick";
 
 // ----- 주제: 클릭한 Mesh 선택하기
 
@@ -60,31 +61,34 @@ export default function example() {
   // 그리기
   const clock = new THREE.Clock();
 
+  function draw() {
+    // const delta = clock.getDelta();
+    const time = clock.getElapsedTime();
+
+    // boxMesh.position.y = Math.sin(time) * 2;
+    // torusMesh.position.y = Math.cos(time) * 2;
+    // boxMesh.material.color.set('plum');
+    // torusMesh.material.color.set('lime');
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
   function checkIntersects() {
-    if (mouseMoved) return;
+    console.log(preventDragClick.mouseMoved);
+    if (preventDragClick.mouseMoved) return;
+
     raycaster.setFromCamera(mouse, camera);
 
     const intersects = raycaster.intersectObjects(meshes);
     for (const item of intersects) {
       console.log(item.object.name);
+      item.object.material.color.set("red");
       break;
     }
     // if (intersects[0]) {
-    //   console.log(intersects[0].object.name);
+    // 	intersects[0].object.material.color.set('blue');
     // }
-  }
-
-  function draw() {
-    // const delta = clock.getDelta();
-    const time = clock.getElapsedTime();
-
-    boxMesh.position.y = Math.sin(time) * 2;
-    torusMesh.position.y = Math.cos(time) * 2;
-    boxMesh.material.color.set("plum");
-    torusMesh.material.color.set("lime");
-
-    renderer.render(scene, camera);
-    renderer.setAnimationLoop(draw);
   }
 
   function setSize() {
@@ -100,30 +104,10 @@ export default function example() {
     mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
     mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
     // console.log(mouse);
-
     checkIntersects();
   });
-  let mouseMoved; // 마우스를 드래그 했는지 true / false
-  let clickStartX;
-  let clickStartY;
-  let clickStartTime;
 
-  canvas.addEventListener("mousedown", (e) => {
-    clickStartX = e.clientX;
-    clickStartY = e.clientY;
-    clickStartTime = Date.now();
-  });
-  canvas.addEventListener("mouseup", (e) => {
-    const xGap = Math.abs(e.clientX - clickStartX);
-    const yGap = Math.abs(e.clientY - clickStartY);
-    const timeGap = Date.now() - clickStartTime;
-
-    if (xGap > 5 || yGap > 5 || timeGap > 500) {
-      mouseMoved = true;
-    } else {
-      mouseMoved = false;
-    }
-  });
+  const preventDragClick = new PreventDragClick(canvas);
 
   draw();
 }
